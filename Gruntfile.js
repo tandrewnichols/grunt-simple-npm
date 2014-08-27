@@ -43,8 +43,14 @@ module.exports = function(grunt) {
         ui: 'mocha-given',
         require: 'coffee-script/register'
       },
-      test: {
-        src: ['test/helpers.coffee', 'test/**/*.coffee']
+      unit: {
+        src: ['test/helpers.coffee', 'test/**/*.coffee', '!test/acceptance.coffee']
+      },
+      e2e: {
+        options: {
+          timeout: 5000
+        },
+        src: ['test/acceptance.coffee']
       }
     },
     npm: {
@@ -63,7 +69,7 @@ module.exports = function(grunt) {
     }
   });
 
-  grunt.registerTask('mocha', ['mochaTest:test']);
+  grunt.registerTask('mocha', ['mochaTest']);
   grunt.registerTask('default', ['jshint:all', 'mocha']);
   grunt.registerTask('coverage', ['mochacov:html']);
   grunt.registerTask('travis', ['jshint:all', 'mocha', 'mochacov:lcov']);
