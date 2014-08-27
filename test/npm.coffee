@@ -45,7 +45,7 @@ describe 'npm', ->
     Given -> @context.target = 'install'
     Given -> @context.options.returns
       d: true
-      t: 'v0.0.1' # not a real option, don't try to use
+      t: 'v0.0.1'
       g: true
     When ->
       @grunt.registerMultiTask.getCall(0).args[2].apply @context, []
@@ -104,7 +104,7 @@ describe 'npm', ->
     Given -> @cp.spawn.withArgs('npm', ['add-user', '--save-dev'], { stdio: 'inherit', cwd: '.' }).returns @emitter
     Given -> @context.target = 'addUser'
     Given -> @context.options.returns
-      saveDev: true # Not a real option on add-user
+      saveDev: true
     When ->
       @grunt.registerMultiTask.getCall(0).args[2].apply @context, []
       @emitter.emit 'close', 0
@@ -134,8 +134,8 @@ describe 'npm', ->
 
   describe 'options have equal sign', ->
     Given -> @emitter = new EventEmitter()
-    Given -> @cp.spawn.withArgs('npm', ['log', '--author=nichols'], { stdio: 'inherit', cwd: '.' }).returns @emitter
-    Given -> @context.target = 'log'
+    Given -> @cp.spawn.withArgs('npm', ['set', '--author=nichols'], { stdio: 'inherit', cwd: '.' }).returns @emitter
+    Given -> @context.target = 'set'
     Given -> @context.options.returns
       'author=': 'nichols'
     When ->

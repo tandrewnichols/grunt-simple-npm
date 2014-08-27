@@ -48,6 +48,18 @@ module.exports = function(grunt) {
       }
     },
     npm: {
+      setEmail: {
+        cmd: 'config set email tandrewnichols@gmail.com'
+      },
+      config: {
+        cmd: 'config get email'
+      },
+      ls: {
+        options: {
+          json: true,
+          depth: 0
+        }
+      }
     }
   });
 
