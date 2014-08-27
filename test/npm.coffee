@@ -11,6 +11,7 @@ describe 'npm', ->
   Given -> @context.options.returns {}
   Given -> @cp =
     spawn: sinon.stub()
+  Given -> @emitter = new EventEmitter()
   Given -> @subject = sandbox '../tasks/npm',
     child_process: @cp
 
@@ -18,7 +19,6 @@ describe 'npm', ->
   And -> expect(@grunt.registerMultiTask).to.have.been.calledWith 'npm', 'A simple API for using npm via grunt', sinon.match.func
 
   describe 'command with npm options', ->
-    Given -> @emitter = new EventEmitter()
     Given -> @cp.spawn.withArgs('npm', ['install', '--tag', 'v0.2.0'], { stdio: 'inherit', cwd: '.' }).returns @emitter
     Given -> @context.target = 'install'
     Given -> @context.options.returns
@@ -29,7 +29,6 @@ describe 'npm', ->
     Then -> expect(@cb).to.have.been.called
 
   describe 'command with a boolean flag', ->
-    Given -> @emitter = new EventEmitter()
     Given -> @cp.spawn.withArgs('npm', ['install', '--production'], { stdio: 'inherit', cwd: '.' }).returns @emitter
     Given -> @context.target = 'install'
     Given -> @context.options.returns
@@ -40,7 +39,6 @@ describe 'npm', ->
     Then -> expect(@cb).to.have.been.called
 
   describe 'command with short flags', ->
-    Given -> @emitter = new EventEmitter()
     Given -> @cp.spawn.withArgs('npm', ['install', '-dg', '-t', 'v0.0.1'], { stdio: 'inherit', cwd: '.' }).returns @emitter
     Given -> @context.target = 'install'
     Given -> @context.options.returns
@@ -53,7 +51,6 @@ describe 'npm', ->
     Then -> expect(@cb).to.have.been.called
 
   describe 'command with extra options', ->
-    Given -> @emitter = new EventEmitter()
     Given -> @cp.spawn.withArgs('npm', ['install', '--tag', 'v0.2.0'], { stdio: 'foo', cwd: 'bar' }).returns @emitter
     Given -> @context.target = 'install'
     Given -> @context.options.returns
@@ -67,7 +64,6 @@ describe 'npm', ->
     Then -> expect(@cb).to.have.been.called
 
   describe 'command with sub-commands', ->
-    Given -> @emitter = new EventEmitter()
     Given -> @cp.spawn.withArgs('npm', ['config', 'set', 'init.author.email', 'tandrewnichols@gmail.com'], { stdio: 'inherit', cwd: '.' }).returns @emitter
     Given -> @context.target = 'config'
     Given -> @context.data =
@@ -78,7 +74,6 @@ describe 'npm', ->
     Then -> expect(@cb).to.have.been.called
 
   describe 'command with sub-commands with "npm" at the front', ->
-    Given -> @emitter = new EventEmitter()
     Given -> @cp.spawn.withArgs('npm', ['config', 'set', 'init.author.email', 'tandrewnichols@gmail.com'], { stdio: 'inherit', cwd: '.' }).returns @emitter
     Given -> @context.target = 'config'
     Given -> @context.data =
@@ -89,7 +84,6 @@ describe 'npm', ->
     Then -> expect(@cb).to.have.been.called
 
   describe 'command with a different name', ->
-    Given -> @emitter = new EventEmitter()
     Given -> @cp.spawn.withArgs('npm', ['config', 'set', 'init.author.email', 'tandrewnichols@gmail.com'], { stdio: 'inherit', cwd: '.' }).returns @emitter
     Given -> @context.target = 'banana'
     Given -> @context.data =
@@ -100,7 +94,6 @@ describe 'npm', ->
     Then -> expect(@cb).to.have.been.called
 
   describe 'dasherizes commands and options', ->
-    Given -> @emitter = new EventEmitter()
     Given -> @cp.spawn.withArgs('npm', ['add-user', '--save-dev'], { stdio: 'inherit', cwd: '.' }).returns @emitter
     Given -> @context.target = 'addUser'
     Given -> @context.options.returns
@@ -111,7 +104,6 @@ describe 'npm', ->
     Then -> expect(@cb).to.have.been.called
 
   describe 'allows raw args as string', ->
-    Given -> @emitter = new EventEmitter()
     Given -> @cp.spawn.withArgs('npm', ['install', 'package@0.1.2#foo'], { stdio: 'inherit', cwd: '.' }).returns @emitter
     Given -> @context.target = 'install'
     Given -> @context.data =
@@ -122,7 +114,6 @@ describe 'npm', ->
     Then -> expect(@cb).to.have.been.called
 
   describe 'allows raw args as array', ->
-    Given -> @emitter = new EventEmitter()
     Given -> @cp.spawn.withArgs('npm', ['install', '---blah^foo hi'], { stdio: 'inherit', cwd: '.' }).returns @emitter
     Given -> @context.target = 'install'
     Given -> @context.data =
@@ -133,7 +124,6 @@ describe 'npm', ->
     Then -> expect(@cb).to.have.been.called
 
   describe 'options have equal sign', ->
-    Given -> @emitter = new EventEmitter()
     Given -> @cp.spawn.withArgs('npm', ['set', '--author=nichols'], { stdio: 'inherit', cwd: '.' }).returns @emitter
     Given -> @context.target = 'set'
     Given -> @context.options.returns
