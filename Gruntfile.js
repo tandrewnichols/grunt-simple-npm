@@ -48,7 +48,7 @@ module.exports = function(grunt) {
       },
       e2e: {
         options: {
-          timeout: 5000
+          timeout: 10000
         },
         src: ['test/acceptance.coffee']
       }

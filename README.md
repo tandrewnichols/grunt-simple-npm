@@ -24,7 +24,7 @@ Alternatively, install and use [task-master](https://github.com/tandrewnichols/t
 
 ## The "npm" task
 
-After writing the `grunt-simple-git` plugin, I realized it would be handy to have the same functionality for npm. They're so similar I probably could've made them one thing, and maybe someday I will. For now, though I kind of appreciate the semantic separation. You know what you're getting when you install `grunt-simple-npm` or `grunt-simple-git`, whereas with something like `grunt-simple-cli` you might not.
+After writing the `grunt-simple-git` plugin, I realized it would be handy to have the same functionality for npm. They're so similar I probably could've made them one thing, and maybe someday I will. For now, though, I kind of appreciate the semantic separation. You know what you're getting when you install `grunt-simple-npm` or `grunt-simple-git`, whereas with something like `grunt-simple-cli` you might not.
 
 ### Overview
 
@@ -33,38 +33,21 @@ The `npm` task is a multiTask, where the target is (usually) the npm command to 
 ```javascript
 grunt.initConfig({
   npm: {
-    status: {
-      options: {
-        short: true
-      }
+    version: {
+      cmd: 'version patch'
     },
-    add: {
-      options: {
-        all: true
-      }
-    },
-    commit: {
-      options: {
-        message: 'Automated commit'
-      }
-    },
-    pushToOrigin: {
-      cmd: 'push origin master'
-    },
-    pushToHeroku: {
-      cmd: 'push heroku master'
-    }
+    publish: {}
   },
 });
 ```
 
-Then add an alias task to bundle them into one thing. I use something like this:
+Then add an alias task to bundle them into one thing. For instance, I use something like this:
 
 ```javascript
-grunt.registerTask('deploy', ['copy', 'npm:add', 'npm:commit', 'npm:pushToOrigin', 'npm:pushToHeroku']);
+grunt.registerTask('publish', ['npm:version', 'git:push', /* other house keeping tasks . . . */ 'npm:publish']);
 ```
 
-Now I simply run `grunt deploy` from the command line and all my readmes and coverage files are copied, staged, committed, and pushed automatically.
+Now I simply run `grunt publish` to handle versioning, publishing, and all my other publish-oriented tasks.
 
 ### Options
 
@@ -73,79 +56,57 @@ Any npm option can be specified, though there are some variations. Any long or s
 ```javascript
 grunt.initConfig({
   npm: {
-    log: {
-      // Short option - Runs 'git log -n 2'
-      n: 2
-    },
-    commit: {
-      // Long option - Runs 'git commit --message "A message"'
-      message: 'A message'
-    }
-  }
-});
-```
-
-Options that are just flags (i.e. they have no value after them) are specified with `true`:
-
-```javascript
-grunt.initConfig({
-  npm: {
-    // 'git log --name-only'
-    log: {
-      nameOnly: true
-    },
-    // 'git commit -na -m "A message"'
-    commit: {
-      m: 'A message',
-      n: true,
-      a: true
-    }
-  }
-});
-```
-
-You can also specify `=` style options. Just add `=` to the end of the arg:
-
-```javascript
-grunt.initConfig({
-  npm: {
-    // 'git show --summary --format=%s'
-    show: {
-      summary: true,
-      'format=': '%s'
-    }
-  }
-});
-```
-
-Sub-commands that aren't options (e.g. "npm push origin master", "npm checkout foo", "npm show HEAD~", etc.) can be specified using the `cmd` key.
-
-```javascript
-grunt.initConfig({
-  npm: {
-    // 'git push origin master --dry-run'
-    push: {
+    // Short option - Runs 'npm install -S'
+    install: {
       options: {
-        dryRun: true
-      },
-      cmd: 'push origin master'
+        q: true,
+        saveDev: true
+      }
+    },
+    // Long option - Runs 'npm publish --tag 0.1.2'
+    publish: {
+      options: {
+        tag: '0.1.2'
+      }
     }
   }
 });
 ```
 
-It might seem redundant specifying `push` as part of the `cmd` when it's the name of the target, but that's because the `cmd` option doubles as a way to run the same npm command with different arguments:
+Options that are just flags (i.e. they have no value after them) are specified with `true`, as above.
+
+Sub-commands that aren't options (e.g. "npm config set email myEmail@emial.com", "npm version patch", "npm ls grunt", etc.) can be specified using the `cmd` key.
 
 ```javascript
 grunt.initConfig({
   npm: {
-    // 'git push origin master'
-    origin: {
-      cmd: 'push origin master'
+    // 'npm version patch --message "New version 0.1.2"'
+    version: {
+      options: {
+        message: 'New version %s'
+      },
+      cmd: 'version patch'
+    }
+  }
+});
+```
+
+It might seem redundant specifying `version` as part of the `cmd` when it's the name of the target, but that's because the `cmd` option doubles as a way to run the same npm command with different arguments:
+
+```javascript
+grunt.initConfig({
+  npm: {
+    // 'npm version patch'
+    patch: {
+      cmd: 'version patch'
     },
-    // 'git push heroku master'
-    heroku: {
-      cmd: 'push heroku master'
+    // 'npm version minor'
+    minor: {
+      cmd: 'version minor'
+    },
+    // 'npm version major'
+    major: {
+      cmd: 'version major'
     }
   }
 });
@@ -156,10 +117,10 @@ Finally, if your usage doesn't fit these formats, you can specify raw arguments 
 ```javascript
 grunt.initConfig({
   npm: {
-    // 'git checkout master -- config/*.json'
-    checkout: {
-      cmd: 'checkout master',
-      rawArgs: '-- config/*.json'
+    // 'npm explor grunt -- cat package.json'
+    explor: {
+      cmd: 'explore grunt',
+      rawArgs: '-- cat package.json'
     }
   }
 });
@@ -173,9 +134,9 @@ grunt.initConfig({
     options: {
       cwd: '..'
     },
-    add: {
+    ls: {
       options: {
-        all: true
+        depth: 1
       }
     }
   }
@@ -184,6 +145,6 @@ grunt.initConfig({
 
 ## Coming soon
 
-Filling in options after the fact via prompt (perfect for `npm commit --message` for example).
+Filling in options after the fact via prompt (perfect for `npm install --save` for example).
 
-Ideally, you wouldn't have to do `cmd: 'push origin master'` if the name of the target was `push`. There's no easy way to handle this immediately, but I'd like to improve that eventually.
+Ideally, you wouldn't have to do `cmd: 'version patch'` if the name of the target was `version`. There's no easy way to handle this immediately, but I'd like to improve that eventually.
