@@ -112,6 +112,16 @@ grunt.initConfig({
 });
 ```
 
+Additionally, if `cmd` is the configuration you need, you can pass that as the entirety of the task body:
+
+```javascript
+grunt.initConfig({
+  npm: {
+    owner: 'owner ls grunt-simple-npm'
+  }
+});
+```
+
 Finally, if your usage doesn't fit these formats, you can specify raw arguments to pass to npm using the `rawArgs` option:
 
 ```javascript
@@ -126,13 +136,14 @@ grunt.initConfig({
 });
 ```
 
-There are also a few non-npm related options, specifcally `stdio` and `cwd` which are passed as is to `child_process.spawn` (defaults are `inherit` and `.` respectivly). These are under `options` so that they can be specified for all tasks if desired:
+There are also a few non-npm related options: `stdio` and `cwd`, which are passed as is to `child_process.spawn` (defaults are `inherit` and `process.cwd()` respectivly) and `force`, which you can use for non-critical git commands that should not halt the grunt task chain (like `--force` but on a per task basis). These are under `options` so that they can be specified for all tasks if desired. If you want to turn off `stdio` altogether (which you probably shouldn't do), you can pass `stdio: false`.
 
 ```javascript
 grunt.initConfig({
   npm: {
     options: {
-      cwd: '..'
+      cwd: '..',
+      stdio: false
     },
     ls: {
       options: {
