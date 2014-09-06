@@ -2,7 +2,7 @@
   "name": "grunt-simple-npm",
   "description": "A simple API for using npm via grunt",
   "version": "0.0.2",
-  "homepage": "https://github.com/tandrewnichols/grunt-simple-npm",
+  "homepage": "http://www.tandrewnichols.me/modules/grunt-simple-npm",
   "author": {
     "name": "Andrew Nichols",
     "email": "tandrewnichols@gmail.com",
@@ -51,7 +51,7 @@
     "easy"
   ],
   "dependencies": {
-    "simple-cli": "0.0.1"
+    "simple-cli": "^0.1.0"
   },
   "config": {
     "blanket": {
