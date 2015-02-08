@@ -54,20 +54,6 @@ module.exports = function(grunt) {
         src: ['test/acceptance.coffee']
       }
     },
-    npm: {
-      setEmail: {
-        cmd: 'config set email tandrewnichols@gmail.com'
-      },
-      config: {
-        cmd: 'config get email'
-      },
-      ls: {
-        options: {
-          json: true,
-          depth: 0
-        }
-      }
-    },
     travis: {
       options: {
         targets: {
