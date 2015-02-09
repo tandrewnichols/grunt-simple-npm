@@ -24,11 +24,11 @@ Alternatively, install and use [task-master](https://github.com/tandrewnichols/t
 
 ## The "npm" task
 
-After writing the `grunt-simple-git` plugin, I realized it would be handy to have the same functionality for npm. They're so similar I probably could've made them one thing, and maybe someday I will. For now, though, I kind of appreciate the semantic separation. You know what you're getting when you install `grunt-simple-npm` or `grunt-simple-git`, whereas with something like `grunt-simple-cli` you might not.
+This plugin uses the [simple-cli](https://github.com/tandrewnichols/simple-cli) interface, so any of the options avaiable there will work with this plugin. A summary of the more salient points are included below.
 
 ### Overview
 
-The `npm` task is a multiTask, where the target is (usually) the npm command to run. You can configure as many npm commands as are useful to you either in your `grunt.initConfig` call or, as mentioned above, by using [task-master](https://github.com/tandrewnichols/task-master). I strongly recommend using task-master . . . not just because I wrote it. I wrote it because grunt configuration is messy and annoying and sometimes, at least with `loadNpmTasks`, redundant (I was shocked to learn that you can't pass more than one string to `loadNpmTasks` - it's plural . . . doesn't that mean I should be able to do `grunt.loadNpmTasks('grunt-foo', 'grunt-bar', 'grunt-baz')`? . . . apparently not). I've been using task-master for everything I write now for a few months, and it just makes grunt more pleasurable to use. Things are nicely separated . . . but I digress. Here's a sample configuration:
+The `npm` task is a multiTask, where the target is (usually) the npm command to run. Options to npm can be supplied in the options object, and there are various options supported by the library itself which must be under `options.simple`.
 
 ```javascript
 grunt.initConfig({
@@ -49,113 +49,388 @@ grunt.registerTask('publish', ['npm:version', 'git:push', /* other house keeping
 
 Now I simply run `grunt publish` to handle versioning, publishing, and all my other publish-oriented tasks.
 
-### Options
+### npm Options
 
-Any npm option can be specified, though there are some variations. Any long or short option can be specified using camelCase notation (it will be converted to dash notation):
+Generally speaking, options are supplied as camel-cased equivalents of the command line options. Specifically, you can do any/all of the following:
 
-```javascript
+#### Long options
+
+```js
 grunt.initConfig({
   npm: {
-    // Short option - Runs 'npm install -S'
     install: {
       options: {
-        q: true,
-        saveDev: true
-      }
-    },
-    // Long option - Runs 'npm publish --tag 0.1.2'
-    publish: {
-      options: {
-        tag: '0.1.2'
+        tag: 'v1.0.0'
       }
     }
   }
 });
 ```
 
-Options that are just flags (i.e. they have no value after them) are specified with `true`, as above.
+This will run `npm install --tag v1.0.0`
 
-Sub-commands that aren't options (e.g. "npm config set email myEmail@emial.com", "npm version patch", "npm ls grunt", etc.) can be specified using the `cmd` key.
+#### Boolean options
 
-```javascript
+```js
 grunt.initConfig({
   npm: {
-    // 'npm version patch --message "New version 0.1.2"'
+    install: {
+      options: {
+        production: true
+      }
+    }
+  }
+});
+```
+
+This will run `npm install --production`
+
+#### Multi-word options
+
+```js
+grunt.initConfig({
+  npm: {
+    install: {
+      options: {
+        noOptional: true
+      }
+    }
+  }
+});
+```
+
+This will run `npm install --no-optional`
+
+#### Short options
+
+```js
+grunt.initConfig({
+  npm: {
     version: {
       options: {
-        message: 'New version %s'
-      },
-      cmd: 'version patch'
-    }
-  }
-});
-```
-
-It might seem redundant specifying `version` as part of the `cmd` when it's the name of the target, but that's because the `cmd` option doubles as a way to run the same npm command with different arguments:
-
-```javascript
-grunt.initConfig({
-  npm: {
-    // 'npm version patch'
-    patch: {
-      cmd: 'version patch'
-    },
-    // 'npm version minor'
-    minor: {
-      cmd: 'version minor'
-    },
-    // 'npm version major'
-    major: {
-      cmd: 'version major'
-    }
-  }
-});
-```
-
-Additionally, if `cmd` is the configuration you need, you can pass that as the entirety of the task body:
-
-```javascript
-grunt.initConfig({
-  npm: {
-    owner: 'owner ls grunt-simple-npm'
-  }
-});
-```
-
-Finally, if your usage doesn't fit these formats, you can specify raw arguments to pass to npm using the `rawArgs` option:
-
-```javascript
-grunt.initConfig({
-  npm: {
-    // 'npm explor grunt -- cat package.json'
-    explor: {
-      cmd: 'explore grunt',
-      rawArgs: '-- cat package.json'
-    }
-  }
-});
-```
-
-There are also a few non-npm related options: `stdio` and `cwd`, which are passed as is to `child_process.spawn` (defaults are `inherit` and `process.cwd()` respectivly) and `force`, which you can use for non-critical git commands that should not halt the grunt task chain (like `--force` but on a per task basis). These are under `options` so that they can be specified for all tasks if desired. If you want to turn off `stdio` altogether (which you probably shouldn't do), you can pass `stdio: false`.
-
-```javascript
-grunt.initConfig({
-  npm: {
-    options: {
-      cwd: '..',
-      stdio: false
-    },
-    ls: {
-      options: {
-        depth: 1
+        args: ['patch'],
+        m: '"Update to v1.0.0"'
       }
     }
   }
 });
 ```
 
-## Coming soon
+This will run `npm version patch -m "Update to v1.0.0"`
 
-Filling in options after the fact via prompt (perfect for `npm install --save` for example).
+#### Short boolean options
 
-Ideally, you wouldn't have to do `cmd: 'version patch'` if the name of the target was `version`. There's no easy way to handle this immediately, but I'd like to improve that eventually.
+```js
+grunt.initConfig({
+  npm: {
+    install: {
+      options: {
+        d: true
+      }
+    }
+  }
+});
+```
+
+This will run `npm install -d`
+
+#### Multiple short options grouped together
+
+I'm not sure such a thing exists in npm, but if it does, it will work. Here's a fake example:
+
+```js
+grunt.initConfig({
+  npm: {
+    fake: {
+      options: {
+        a: true,
+        n: true,
+        m: '"Fix stuff"'
+      }
+    }
+  }
+});
+```
+
+This will run `npm fake -an -m "Fix Stuff"`
+
+#### Options with equal signs
+
+Again, I can't think of an actual npm command that uses this structure, but it would work:
+
+```js
+grunt.initConfig({
+  npm: {
+    fake: {
+      options: {
+        'author=': 'tandrewnichols'
+      }
+    }
+  }
+});
+```
+
+This will run `npm fake --author=tandrewnichols`
+
+#### Arrays of options
+
+And again, another feature that may not get much exercise under npm, but it's there if you need it.
+
+```js
+grunt.initConfig({
+  npm: {
+    fake: {
+      options: {
+        a: ['foo', 'bar'],
+        greeting: ['hello', 'goodbye']
+      }
+    }
+  }
+});
+```
+
+This will run `npm fake -a foo -a bar --greeting hello --greeting goodbye`, which, as previously mentioned, is nothing.
+
+### Task Options
+
+Simple cli can be configured by specifying any of the following options under `options.simple`.
+
+#### env
+
+Supply additional environment variables to the child process.
+
+```js
+grunt.initConfig({
+  npm: {
+    publish: {
+      options: {
+        simple: {
+          env: {
+            FOO: 'bar'
+          }
+        }
+      }
+    }
+  }
+});
+```
+
+#### cwd
+
+Set the current working directory for the child process.
+
+```js
+grunt.initConfig({
+  npm: {
+    uninstall: {
+      options: {
+        simple: {
+          cwd: './test'
+        }
+      }
+    }
+  }
+});
+```
+
+#### force
+
+If the task fails, don't halt the entire task chain.
+
+```js
+grunt.initConfig({
+  npm: {
+    install: {
+      options: {
+        simple: {
+          force: true
+        }
+      }
+    }
+  }
+});
+```
+
+#### onComplete
+
+A callback to handle the stdout and stderr streams. `simple-cli` aggregates the stdout and stderr data output and will supply the final strings to the `onComplete` function. This function should have the signature `function(err, stdout, callback)` where `err` is an error object containing the stderr stream (if any errors were reported) and the code returned by the child process (as `err.code`), `stdout` is a string, and `callback` is a function. The callback must be called with a falsy value to complete the task (calling it with a truthy value - e.g. `1` - will fail the task).
+
+```js
+grunt.initConfig({
+  npm: {
+    ls: {
+      options: {
+        simple: {
+          onComplete: function(err, stdout, callback) {
+            if (err) {
+              grunt.fail.fatal(err.message, err.code);
+            } else {
+              grunt.config.set('cli output', stdout);
+              callback();
+            }
+          });
+        }
+      }
+    }
+  }
+});
+```
+
+#### cmd
+
+An alternative sub-command to call on the cli. This is useful when you want to create multiple targets that call the same command with different options/parameters. If this value is present, it will be used instead of the grunt target as the first argument to the executable.
+
+```js
+grunt.initConfig({
+  // Using git as a real example
+  npm: {
+    major: {
+      options: {
+        simple: {
+          cmd: 'version',
+          args: ['major']
+        }
+      }
+    },
+    minor: {
+      options: {
+        simple: {
+          cmd: 'version',
+          args: 'minor'
+        }
+      }
+    }
+  }
+});
+```
+
+Running `grunt npm:major` will run `npm version major` and running `grunt npm:minor` will run `npm version minor`.
+
+#### args
+
+Additional, non-flag arguments to pass to the executable. These can be passed as an array (as in `npm:major` above) or as a single string with arguments separated by a space (as in `npm:minor` above).
+
+#### rawArgs
+
+`rawArgs` is a catch all for any arguments to git that can't be handled (for whatever reason) with the options above (e.g. arguments supplied to arbitrary scripts: `npm run-script doStuff -- --foo bar`). Anything in `rawArgs` will be concatenated to the end of all the normal args.
+
+```js
+grunt.initConfig({
+  npm: {
+    runScript: {
+      options: {
+        simple: {
+          args: ['doStuff'],
+          rawArgs: '-- --foo bar'
+        }
+      }
+    }
+  }
+});
+```
+
+#### debug
+
+Similar to `--dry-run` in many executables. This will log the command that will be spawned in a child process without actually spawning it. Additionally, if you have an onComplete handler, a fake stderr and stdout will be passed to this handler, simulating the real task. If you want to use specific stderr/stdout messages, `debug` can also be an object with `stderr` and `stdout` properties that will be passed to the onComplete handler.
+
+```js
+grunt.initConfig({
+  npm: {
+    ls: {
+      options: {
+        simple: {
+          // Invoked with default fake stderr/stdout
+          onComplete: function(err, stdout, callback) {
+            console.log(arguments);
+          },
+          debug: true
+        }
+      }
+    },
+    outdated: {
+      options: {
+        simple: {
+          // Invoked with 'foo' and 'bar'
+          onComplete: function(err, stdout, callback) {
+            console.log(arguments);
+          },
+          debug: {
+            stderr: 'foo',
+            stdout: 'bar'
+          }
+        }
+      }
+    }
+  }
+});
+```
+
+Additionally, you can pass the `--debug` option to grunt itself to enable the above behavior in an ad hoc manner.
+
+### Dynamic values
+
+Sometimes you just don't know what values you want to supply to for an option until you're ready to use it (for instance, `--message`). That makes it hard to put into a task. `simple-cli` supports dynamical values (via interpolation) which can be supplied in any of three ways:
+
+#### via command line options to grunt (e.g. grunt.option)
+
+Supply the value when you call the task itself.
+
+```js
+grunt.initConfig({
+  npm: {
+    version: {
+      options: {
+        simple: {
+          // You can also do this as a string, but note that simple-cli splits
+          // string args on space, so you wouldn't be able to put space INSIDE
+          // the interpolation. You'd have to say args: '{{portion}}'
+          args: ['{{ portion }}']
+        }
+      }
+    }
+  }
+});
+```
+
+If the above was invoked with `grunt npm:version --portion major` the final command would be `npm version major`.
+
+#### via grunt.config
+
+This is primarily useful if you want the result of another task to determine the value of an argument. For instance, maybe in another task you say `grunt.config.set('portion', 'minor')`, then the task above would run `npm version minor`.
+
+#### via prompt
+
+If `simple-cli` can't find an interpolation value via `grunt.option` or `grunt.config`, it will prompt you for one on the terminal. Thus you could do something like:
+
+```js
+grunt.initConfig({
+  npm: {
+    version: {
+      options: {
+        simple: {
+          args: 'major'
+        },
+        message: '{{ message }}'
+      }
+    }
+  }
+});
+```
+
+and automate commits for version bumps, while still supplying an accurate message.
+
+### Shortcut configurations
+
+For very simple tasks, you can define the task body as an array or string, rather than as an object, as all the above examples have been.
+
+```js
+grunt.initConfig({
+  npm: {
+    // will invoke "npm version major"
+    major: ['version major'],
+
+    // will invoke "npm run acceptance"
+    run: 'run acceptance'
+  }
+});
+```
