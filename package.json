@@ -1,7 +1,7 @@
 {
   "name": "grunt-simple-npm",
   "description": "A simple API for using npm via grunt",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "homepage": "http://www.tandrewnichols.me/modules/grunt-simple-npm",
   "author": {
     "name": "Andrew Nichols",
