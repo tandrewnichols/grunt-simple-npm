@@ -2,11 +2,10 @@
   "name": "grunt-simple-npm",
   "description": "A simple API for using npm via grunt",
   "version": "1.0.0",
-  "homepage": "http://www.tandrewnichols.me/modules/grunt-simple-npm",
   "author": {
     "name": "Andrew Nichols",
     "email": "tandrewnichols@gmail.com",
-    "url": "www.tandrewnichols.me"
+    "url": "http://www.tandrewnichols.me"
   },
   "repository": {
     "type": "git",
