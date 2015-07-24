@@ -1,12 +1,17 @@
 language: node_js
+sudo: false
 before_install:
   - "export CODECLIMATE_REPO_TOKEN=04344935d439718d5982fddb88c6e39a9ca9fc057f8eea3399a05f139dac6a36"
 install:
-  - "npm install npm -g"
   - "npm install grunt-cli codeclimate-test-reporter -g"
   - "npm install"
 script:
   - "grunt ci"
 node_js:
-  - "0.8"
   - "0.10"
+  - "0.12"
+  - "iojs-v1"
+  - "iojs-v2"
+cache:
+  directories:
+    - 'node_modules'
