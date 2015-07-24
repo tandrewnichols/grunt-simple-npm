@@ -1,7 +1,5 @@
 [![Build Status](https://travis-ci.org/tandrewnichols/grunt-simple-npm.png)](https://travis-ci.org/tandrewnichols/grunt-simple-npm) [![downloads](http://img.shields.io/npm/dm/grunt-simple-npm.svg)](https://npmjs.org/package/grunt-simple-npm) [![npm](http://img.shields.io/npm/v/grunt-simple-npm.svg)](https://npmjs.org/package/grunt-simple-npm) [![Code Climate](https://codeclimate.com/github/tandrewnichols/grunt-simple-npm/badges/gpa.svg)](https://codeclimate.com/github/tandrewnichols/grunt-simple-npm) [![Test Coverage](https://codeclimate.com/github/tandrewnichols/grunt-simple-npm/badges/coverage.svg)](https://codeclimate.com/github/tandrewnichols/grunt-simple-npm) [![dependencies](https://david-dm.org/tandrewnichols/grunt-simple-npm.png)](https://david-dm.org/tandrewnichols/grunt-simple-npm)
 
-[![NPM info](https://nodei.co/npm/grunt-simple-npm.png?downloads=true)](https://nodei.co/npm/grunt-simple-npm.png?downloads=true)
-
 # grunt-simple-npm
 
 A simple API for using npm via grunt
