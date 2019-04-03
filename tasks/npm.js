@@ -1,3 +1,3 @@
-var cli = require('simple-cli');
+const cli = require('simple-cli');
 
 module.exports = cli('npm');
