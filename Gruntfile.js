@@ -1,11 +1,12 @@
 module.exports = function(grunt) {
-  grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-mocha-test');
-  grunt.loadNpmTasks('grunt-mocha-cov');
-  grunt.loadNpmTasks('grunt-open');
   grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-open');
+  grunt.loadNpmTasks('grunt-mocha-test');
   grunt.loadNpmTasks('grunt-travis-matrix');
+  grunt.loadNpmTasks('grunt-eslint');
+  grunt.loadNpmTasks('grunt-simple-istanbul');
+  grunt.loadNpmTasks('grunt-shell');
+  grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadTasks('tasks');
 
   grunt.initConfig({
@@ -26,70 +27,53 @@ module.exports = function(grunt) {
         }
       }
     },
-    jshint: {
-      options: {
-        reporter: require('jshint-stylish'),
-        eqeqeq: true,
-        es3: true,
-        indent: 2,
-        newcap: true,
-        quotmark: 'single'
-      },
-      all: ['tasks/*.js']
-    },
-    mochacov: {
-      lcov: {
+    eslint: {
+      tasks: {
         options: {
-          reporter: 'mocha-lcov-reporter',
-          instrument: true,
-          ui: 'mocha-given',
-          require: 'coffee-script/register',
-          output: 'coverage/coverage.lcov'
+          configFile: '.eslint.json',
+          format: 'node_modules/eslint-codeframe-formatter'
         },
-        src: ['test/helpers.coffee', 'test/**/*.coffee', '!test/acceptance.coffee'],
-      },
-      html: {
-        options: {
-          reporter: 'html-cov',
-          ui: 'mocha-given',
-          require: 'coffee-script/register',
-          output: 'coverage/coverage.html'
-        },
-        src: ['test/helpers.coffee', 'test/**/*.coffee', '!test/acceptance.coffee']
+        src: ['tasks/**/*.js']
       }
     },
-    mochaTest: {
-      options: {
-        reporter: 'spec',
-        ui: 'mocha-given',
-        require: 'coffee-script/register'
-      },
+    shell: {
+      codeclimate: 'npm run codeclimate'
+    },
+    travisMatrix: {
+      v10: {
+        test: function() {
+          return /^v10/.test(process.version);
+        },
+        tasks: ['istanbul:unit', 'shell:codeclimate']
+      }
+    },
+    istanbul: {
       unit: {
-        src: ['test/helpers.coffee', 'test/**/*.coffee', '!test/acceptance.coffee']
-      },
-      e2e: {
         options: {
-          timeout: 10000
-        },
-        src: ['test/acceptance.coffee']
-      }
-    },
-    travis: {
-      options: {
-        targets: {
-          test: '{{ version }}',
-          when: 'v0.10',
-          tasks: ['mochacov:lcov', 'matrix:v0.10']
+          root: 'tasks',
+          dir: 'coverage',
+          simple: {
+            cmd: 'cover',
+            args: ['grunt', 'mocha'],
+            rawArgs: ['--', '--color']
+          }
         }
       }
     },
-    matrix: {
-      'v0.10': 'codeclimate < coverage/coverage.lcov'
+    mochaTest: {
+      test: {
+        options: {
+          reporter: 'spec',
+          require: 'should'
+        },
+        src: ['test/**/*.js']
+      }
     }
   });
 
-  grunt.registerTask('mocha', ['mochaTest']);
-  grunt.registerTask('default', ['jshint:all', 'mocha']);
-  grunt.registerTask('coverage', ['mochacov:html']);
-  grunt.registerTask('ci', ['jshint:all', 'mocha', 'travis']);
+  grunt.registerTask('mocha', ['mochaTest:test']);
+  grunt.registerTask('test', ['mochaTest:test']);
+  grunt.registerTask('default', ['eslint:tasks', 'mocha']);
+  grunt.registerTask('cover', ['istanbul:unit', 'open:coverage']);
+  grunt.registerTask('ci', ['eslint:tasks', 'mocha', 'travisMatrix']);
 };
